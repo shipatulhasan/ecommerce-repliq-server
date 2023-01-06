@@ -10,9 +10,12 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// connection
 app.get('/',(req,res)=>{
     res.send('bubu form node')
 })
+
+// jwt verification for auth
 const verifyJWT = (req,res,next)=>{
   const auth = req.headers.authorization
   if(!auth){
@@ -37,8 +40,9 @@ const client = new MongoClient(process.env.uri, {
 
   const run = async()=>{
       try{
-        const productsCollection = client.db("ecommerceReplciq").collection("products");
         const usersCollection = client.db("ecommerceReplciq").collection("users");
+
+      
 
         app.post('/register',async(req,res)=>{
           const user = req.body
@@ -53,7 +57,9 @@ const client = new MongoClient(process.env.uri, {
           res.send(result)
       })
 
-      app.put('/login',async(req,res)=>{
+  // check user is exist or not
+
+      app.post('/login',async(req,res)=>{
         const user = req.body
        
         const query = {phone:user.phone,password:user.password}
@@ -67,6 +73,8 @@ const client = new MongoClient(process.env.uri, {
         }
         res.status(400).send({message:'invalid credential'})
     })
+
+    // auth controller
       app.get('/auth',verifyJWT,async(req,res)=>{
         const user = req.decoded
         const query = {phone:user.phone}
